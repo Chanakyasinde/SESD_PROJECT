@@ -17,12 +17,13 @@ type Dependencies struct {
 	OrderUsecase   usecases.OrderUsecase
 	JWTService     *security.JWTService
 	Logger         *slog.Logger
+	AllowedOrigins []string
 }
 
 func NewRouter(dep Dependencies) *gin.Engine {
 	r := gin.New()
 	r.Use(middleware.Recover())
-	r.Use(middleware.CORS())
+	r.Use(middleware.CORS(dep.AllowedOrigins))
 	r.Use(middleware.Logging(dep.Logger))
 
 	authHandler := NewAuthHandler(dep.AuthUsecase)

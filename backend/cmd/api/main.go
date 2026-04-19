@@ -56,6 +56,7 @@ func main() {
 		OrderUsecase:   orderUC,
 		JWTService:     jwtSvc,
 		Logger:         appLogger,
+		AllowedOrigins: cfg.AllowedOrigins,
 	})
 
 	srv := &http.Server{

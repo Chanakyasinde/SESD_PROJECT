@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -16,6 +17,7 @@ type Config struct {
 	JWTSecret        string
 	JWTIssuer        string
 	JWTExpiresInHour int
+	AllowedOrigins   []string
 }
 
 func Load() (Config, error) {
@@ -26,6 +28,14 @@ func Load() (Config, error) {
 		return Config{}, fmt.Errorf("invalid JWT_EXPIRES_IN_HOURS: %w", err)
 	}
 
+	allowedOriginsStr := getEnv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174")
+	allowedOrigins := []string{}
+	for _, origin := range strings.Split(allowedOriginsStr, ",") {
+		if trimmed := strings.TrimSpace(origin); trimmed != "" {
+			allowedOrigins = append(allowedOrigins, trimmed)
+		}
+	}
+
 	cfg := Config{
 		AppEnv:           getEnv("APP_ENV", "development"),
 		Port:             getEnv("PORT", "8080"),
@@ -34,6 +44,7 @@ func Load() (Config, error) {
 		JWTSecret:        getEnv("JWT_SECRET", ""),
 		JWTIssuer:        getEnv("JWT_ISSUER", "inventory-api"),
 		JWTExpiresInHour: expires,
+		AllowedOrigins:   allowedOrigins,
 	}
 
 	if cfg.MongoURI == "" {

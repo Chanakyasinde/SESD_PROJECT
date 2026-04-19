@@ -1,18 +1,18 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
-func CORS() gin.HandlerFunc {
-	allowedOrigins := map[string]struct{}{
-		"http://localhost:5173": {},
-		"http://localhost:5174": {},
-		"http://127.0.0.1:5173": {},
-		"http://127.0.0.1:5174": {},
+func CORS(allowedOrigins []string) gin.HandlerFunc {
+	originsMap := make(map[string]struct{})
+	for _, origin := range allowedOrigins {
+		originsMap[origin] = struct{}{}
 	}
 
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
-		if _, ok := allowedOrigins[origin]; ok {
+		if _, ok := originsMap[origin]; ok {
 			c.Header("Access-Control-Allow-Origin", origin)
 			c.Header("Vary", "Origin")
 		}
